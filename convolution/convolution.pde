@@ -11,10 +11,10 @@ void setup() {
 void draw() {
   var input = loadImage("input3.png");
   
-  Color full = new Color(255, 255, 255);
-  Color redd = new Color(29, 0, 0);
-  Color blue = new Color(0, 29, 0);
-  Color spec = new Color(29, 29, 255);
+  Color full = new Color(1, 1, 1);
+  Color redd = new Color(0.25, 0, 0);
+  Color blue = new Color(0, 0.25, 0);
+  Color spec = new Color(0.25, 0.25, 1);
   Color dark = new Color(0, 0, 0);
   var surface = new Surface(input);
   var kernel = new Kernel(
