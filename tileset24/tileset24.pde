@@ -9,7 +9,7 @@ void setup() {
 
 void draw() {
   System.err.println("Load tileset");
-  var tileset = loadImage("tileset-big-small.png");
+  var tileset = loadImage("tileset.png");
   var tileSide = 14; // in pixels
   var tilesWide = tileset.width / tileSide;
   var tilesHigh = tileset.height / tileSide;

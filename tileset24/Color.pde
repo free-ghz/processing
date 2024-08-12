@@ -6,9 +6,9 @@ public class Color {
   private final int g;
   private final int b;
   public Color(color in) {
-    this.r = in & FLAG_RED;
-    this.g = in & FLAG_GREEN;
-    this.b = in & FLAG_BLUE;
+    this.r = ((in & FLAG_RED)>>16);
+    this.g = ((in & FLAG_GREEN)>>8);
+    this.b = (in & FLAG_BLUE);
   }
   
   public color getProcessingColor() {
