@@ -48,7 +48,9 @@ public class Surface {
           var processedColor = kernel.process(kX, kY, sampledColor);
           collector = collector.add(processedColor);
         }
-        newValues[i] = collector;
+        // newValues[i] = collector;
+        newValues[i] = collector.add(values[i]);
+        // newValues[i] = collector.add(new Color(0.5, 0.5, 0.5));
       }
     }
     return new Surface(newValues, width, height);

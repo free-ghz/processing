@@ -25,7 +25,15 @@ public class Kernel {
 public interface ValueCombiner {
   Color nowKiss(Color surfaceColor, Color kernelColor);
 }
-
+ValueCombiner ignoreBlack(ValueCombiner combiner) {
+  return (a, b) -> {
+    if (a.getLumen() == 0) return a;
+    return combiner.nowKiss(a, b);
+  };
+}
 ValueCombiner multiplicationCombiner = (a, b) -> {
   return a.multiply(b);
+};
+ValueCombiner additionCombiner = (a, b) -> {
+  return a.add(b);
 };

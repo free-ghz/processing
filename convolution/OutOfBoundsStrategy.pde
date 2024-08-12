@@ -18,3 +18,21 @@ OutOfBoundsStrategy blackOobStrategy = (point, surface) -> {
   if (point.y >= surface.getHeight()) return black;
   return surface.getColor(point.x, point.y);
 };
+
+OutOfBoundsStrategy closestOobStrategy = (point, surface) -> {
+  var x = Math.max(0, Math.min(surface.getWidth() - 1, point.x));
+  var y = Math.max(0, Math.min(surface.getHeight() - 1, point.y));
+  return surface.getColor(x, y);
+};
+
+OutOfBoundsStrategy wrapOobStrategy = (point, surface) -> {
+  var x = point.x;
+  while (x < 0) {
+    x += surface.getWidth();
+  }
+  var y = point.y;
+  while (y < 0) {
+    y += surface.getHeight();
+  }
+  return surface.getColor(x % surface.getWidth(), y%surface.getHeight() );
+};
