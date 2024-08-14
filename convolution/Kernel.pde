@@ -4,10 +4,12 @@ public class Kernel {
   private final Color[] values;
   private final int side;
   private ValueCombiner combiner;
-  private Kernel(Color[] values, int side, ValueCombiner combiner) {
+  private ResultCombinator resultCombinator;
+  private Kernel(Color[] values, int side, ValueCombiner combiner, ResultCombinator resultCombinator) {
     this.values = values;
     this.side = side;
     this.combiner = combiner;
+    this.resultCombinator = resultCombinator;
   }
   public int getSide() {
     return side;
@@ -19,6 +21,9 @@ public class Kernel {
   public Color process(int x, int y, Color surfaceColor) {
     var kernelColor = getColor(x, y);
     return combiner.nowKiss(surfaceColor, kernelColor);
+  }
+  public Color combine(Color originalColor, Color kernelResult) {
+    return resultCombinator.combine(originalColor, kernelResult);
   }
 }
 
@@ -37,3 +42,26 @@ ValueCombiner multiplicationCombiner = (a, b) -> {
 ValueCombiner additionCombiner = (a, b) -> {
   return a.add(b);
 };
+
+
+interface ResultCombinator {
+  Color combine(Color original, Color kernelResult);
+}
+ResultCombinator replace = (original, kernelResult) -> kernelResult;
+ResultCombinator add = (original, kernelResult) -> kernelResult.add(original);
+
+
+public Kernel kernelFromArray(double[][] values, ValueCombiner combiner, ResultCombinator resultCombinator) {
+  var side = values.length;
+  var arrayLength = side * side;
+  var colors = new Color[arrayLength];
+  for (int y = 0; y < side; y++) {
+    for (int x = 0; x < side; x++) {
+      int i = (y * side) + x;
+      var val = values[y][x];
+      var vColor = new Color(val, val, val);
+      colors[i] = vColor;
+    }
+  }
+  return new Kernel(colors, side, combiner, resultCombinator);
+}
