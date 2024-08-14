@@ -15,7 +15,9 @@ void draw() {
   
   
   var surface = new Surface(input);
-  var convolved = surface.convolve(kernel, wrapOobStrategy);
+  
+  var convolved = actOnSurface(kernel, surface, CLOSEST_OOB_STRATEGY, ADDITION_VALUE_COMBINER);
+  
   var outputImage = createImage(convolved.width, convolved.height, ARGB);
   input = loadImage(fileName);
   for (var x = 0; x < convolved.getWidth(); x++) {
@@ -32,4 +34,22 @@ void draw() {
     }
   }
   outputImage.save("output.png");
+}
+
+Surface actOnSurface(
+    Agent agent,
+    Surface surface,
+    OutOfBoundsStrategy outOfBoundsStrategy,
+    ValueCombiner resultCombiner
+) {
+  int surfaceLength = surface.getWidth() * surface.getHeight();
+  var newColors = new Color[surfaceLength];
+  for (int i = 0; i < surfaceLength; i++) {
+    int x = i % surface.getWidth();
+    int y = i / surface.getWidth();
+    var agentResult = agent.process(x, y, surface, outOfBoundsStrategy);
+    var combinedResult = resultCombiner.nowKiss(surface.getColor(x, y), agentResult);
+    newColors[i] = combinedResult;
+  }
+  return new Surface(newColors, surface.getWidth(), surface.getHeight());
 }

@@ -43,7 +43,6 @@ public class Color {
     var calcG = g * other.g;
     var calcB = b * other.b;
     var result =  new Color(calcR, calcG, calcB);
-    // System.out.println("Multiplying " + this + " + " + other + " to create " + result);
     return result;
   }
   public Color add(Color other) {
@@ -51,7 +50,6 @@ public class Color {
     var gSum = g + other.g;
     var bSum = b + other.b;
     var result = new Color(rSum, gSum, bSum);
-    // System.out.println("Adding " + this + " + " + other + " to create " + result);
     return result;
   }
   public String toString() {

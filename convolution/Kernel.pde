@@ -1,15 +1,13 @@
 import java.util.List;
 
-public class Kernel {
+public class Kernel implements Agent {
   private final Color[] values;
   private final int side;
   private ValueCombiner combiner;
-  private ResultCombinator resultCombinator;
-  private Kernel(Color[] values, int side, ValueCombiner combiner, ResultCombinator resultCombinator) {
+  private Kernel(Color[] values, int side, ValueCombiner combiner) {
     this.values = values;
     this.side = side;
     this.combiner = combiner;
-    this.resultCombinator = resultCombinator;
   }
   public int getSide() {
     return side;
@@ -22,36 +20,23 @@ public class Kernel {
     var kernelColor = getColor(x, y);
     return combiner.nowKiss(surfaceColor, kernelColor);
   }
-  public Color combine(Color originalColor, Color kernelResult) {
-    return resultCombinator.combine(originalColor, kernelResult);
+  Color process(int surfaceX, int surfaceY, Surface surface, OutOfBoundsStrategy outOfBoundsStrategy) {
+    Color collector = new Color(0, 0, 0);
+    var kernelOffset = side/2;
+    for (var kY = 0; kY < side; kY++) {
+      for (var kX = 0; kX < side; kX++) {
+        var surfaceSampleX = surfaceX + kX - kernelOffset;
+        var surfaceSampleY = surfaceY + kY - kernelOffset;
+        var sampledColor = outOfBoundsStrategy.correct(surfaceSampleX, surfaceSampleY, surface);
+        var processedColor = process(kX, kY, sampledColor);
+        collector = collector.add(processedColor);
+      }
+    }
+    return collector;
   }
 }
 
-public interface ValueCombiner {
-  Color nowKiss(Color surfaceColor, Color kernelColor);
-}
-ValueCombiner ignoreBlack(ValueCombiner combiner) {
-  return (a, b) -> {
-    if (a.getLumen() == 0) return a;
-    return combiner.nowKiss(a, b);
-  };
-}
-ValueCombiner multiplicationCombiner = (a, b) -> {
-  return a.multiply(b);
-};
-ValueCombiner additionCombiner = (a, b) -> {
-  return a.add(b);
-};
-
-
-interface ResultCombinator {
-  Color combine(Color original, Color kernelResult);
-}
-ResultCombinator replace = (original, kernelResult) -> kernelResult;
-ResultCombinator add = (original, kernelResult) -> kernelResult.add(original);
-
-
-public Kernel kernelFromArray(double[][] values, ValueCombiner combiner, ResultCombinator resultCombinator) {
+public Kernel kernelFromArray(double[][] values, ValueCombiner combiner) {
   var side = values.length;
   var arrayLength = side * side;
   var colors = new Color[arrayLength];
@@ -63,5 +48,10 @@ public Kernel kernelFromArray(double[][] values, ValueCombiner combiner, ResultC
       colors[i] = vColor;
     }
   }
-  return new Kernel(colors, side, combiner, resultCombinator);
+  return new Kernel(colors, side, combiner);
 }
+
+final Kernel EMBOSS11 = kernelFromArray(
+  new double[][]{{-0.019645504897999332,-0.03183277619999173,-0.03345617720353898,-0.0268214078846937,-0.0170810018634102,-0.008681666236361381,-0.0034585499640789243,-0.0010352122341460725,-2.1174795698442395E-4,-2.3527550776047105E-5,0.0},{-0.03183277619999173,-0.05158050619285993,-0.05421077366279193,-0.04345907743204363,-0.02767321792961667,-0.014057021259353998,-0.005583637244952544,-0.0016452943052873564,-3.0304048933698995E-4,0.0,2.3527550776047105E-5},{-0.03345617720353898,-0.05421077366279193,-0.056973387127927634,-0.0456655390442241,-0.02905156610789532,-0.014691250768836685,-0.005705783272035376,-0.001473867216758649,0.0,3.0304048933698995E-4,2.1174795698442395E-4},{-0.0268214078846937,-0.04345907743204363,-0.0456655390442241,-0.0365638989823334,-0.023137923264512757,-0.011395336760541407,-0.003821775900670569,0.0,0.001473867216758649,0.0016452943052873564,0.0010352122341460725},{-0.0170810018634102,-0.02767321792961667,-0.02905156610789532,-0.023137923264512757,-0.014242395818103236,-0.00601998173754879,0.0,0.003821775900670569,0.005705783272035376,0.005583637244952544,0.0034585499640789243},{-0.008681666236361381,-0.014057021259353998,-0.014691250768836685,-0.011395336760541407,-0.00601998173754879,0.0,0.00601998173754879,0.011395336760541407,0.014691250768836685,0.014057021259353998,0.008681666236361381},{-0.0034585499640789243,-0.005583637244952544,-0.005705783272035376,-0.003821775900670569,0.0,0.00601998173754879,0.014242395818103236,0.023137923264512757,0.02905156610789532,0.02767321792961667,0.0170810018634102},{-0.0010352122341460725,-0.0016452943052873564,-0.001473867216758649,0.0,0.003821775900670569,0.011395336760541407,0.023137923264512757,0.0365638989823334,0.0456655390442241,0.04345907743204363,0.0268214078846937},{-2.1174795698442395E-4,-3.0304048933698995E-4,0.0,0.001473867216758649,0.005705783272035376,0.014691250768836685,0.02905156610789532,0.0456655390442241,0.056973387127927634,0.05421077366279193,0.03345617720353898},{-2.3527550776047105E-5,0.0,3.0304048933698995E-4,0.0016452943052873564,0.005583637244952544,0.014057021259353998,0.02767321792961667,0.04345907743204363,0.05421077366279193,0.05158050619285993,0.03183277619999173},{0.0,2.3527550776047105E-5,2.1174795698442395E-4,0.0010352122341460725,0.0034585499640789243,0.008681666236361381,0.0170810018634102,0.0268214078846937,0.03345617720353898,0.03183277619999173,0.019645504897999332}},
+  MULTIPLICATION_VALUE_COMBINER
+);
