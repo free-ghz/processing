@@ -1,1 +1,6 @@
 *.png
+*.jpeg
+*.jpg
+*.gif
+.DS_Store
+*.bak
