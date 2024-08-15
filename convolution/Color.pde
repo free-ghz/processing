@@ -15,6 +15,11 @@ public class Color {
     this.g = g;
     this.b = b;
   }
+  public Color(Color other) {
+    r = other.r;
+    g = other.g;
+    b = other.b;
+  }
   
   private double clamp(double value) {
     return Math.min(1.0, Math.max(0.0, value));
@@ -52,8 +57,26 @@ public class Color {
     var result = new Color(rSum, gSum, bSum);
     return result;
   }
+  public Color subtract(Color other) {
+    var rSum = r - other.r;
+    var gSum = g - other.g;
+    var bSum = b - other.b;
+    var result = new Color(rSum, gSum, bSum);
+    return result;
+  }
   public String toString() {
     return "(" + r + ", " + g + ", " + b + ")";
   }
+  public boolean equals(Object o) {
+    if (!(o instanceof Color)) return false;
+    Color other = (Color) o;
+    return (this.r == other.r && this.g == other.g && this.b == other.b);
+  }
 }
-    
+
+
+final Color COLOR_BLACK = new Color(#000000);
+final Color COLOR_WHITE = new Color(#FFFFFF);
+final Color COLOR_RED = new Color(#FF0000);
+final Color COLOR_GREEN = new Color(#00FF00);
+final Color COLOR_BLUE = new Color(#0000FF);
